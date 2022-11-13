@@ -1,40 +1,19 @@
-import streamlit
-import streamlit as sl
-import pandas as pd
+from flask import Flask, render_template
 
-sl.set_page_config(layout="wide")
+app = Flask(__name__)
 
-col1, col2 = sl.columns(2)
+@app.route("/home")
+def home():
+    return render_template("home.html")
 
-with col1:
-    sl.image("images/photo.png", width=500)
+@app.route("/api/v1/<station>/<data>")
+def about(station, date):
+    temperature = 23
+    return{
+        "station": station,
+        "date": date,
+        "temperature": temperature
+    }
 
-with col2:
-    sl.title('Random Asshole')
-    content = """
-    This is complete and total bullshit and I'm being laughably childish
-    """
-
-    sl.write(content)
-
-comment = """
-    These are some of the projects I've built. 
-"""
-
-sl.write(comment)
-
-col3, emptyCol, col4 = sl.columns([1.5, .5, 1.5])
-df = pd.read_csv('data.csv', sep=";")
-with col3:
-    for index, row in df[:10].iterrows():
-        sl.header(row["title"])
-        sl.write(row["description"])
-        sl.image("images/" + row["image"])
-        sl.write(f"[Source Code]({row['url']})")
-
-with col4:
-    for index, row in df[10:].iterrows():
-        sl.header(row["title"])
-        sl.write(row["description"])
-        sl.image("images/" + row["image"])
-        sl.write(f"[Source Code]({row['url']})")
+if __name__ == "__main__":
+    app.run(debug=True)
