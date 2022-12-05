@@ -1,65 +1,35 @@
-import ssl
-import smtplib
-import time
+class Bill:
+    """
+    A sample billing application for roommates and their share of a bill
+    """
+    def __init__(self, amount, period):
+        self.amount = amount
+        self.period = period
 
-import requests
-import selectorlib
-import sqlite3
+class Roommate:
+    """
+    Creates a roommate object for the bill to go to
+    """
 
-URL = "http://programmer100.pythonanywhere.com/tours/"
-HEADERS = {
-    'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'
-}
-connection = sqlite3.connect("data.db")
+    def __init__(self, name, time):
+        self.name = name
+        self.time = time
 
-def scrape(url):
-    response = requests.get(url, headers=HEADERS)
-    source = response.text
-    return source
+    def pays(self, bill, roomate2):
+        weight = self.time / (self.time + roomate2.time)
+        to_pay = bill.amount * weight
+        return to_pay
 
-def extract(source):
-    extractor = selectorlib.Extractor.from_yaml_file("extract.yaml")
-    value = extractor.extract(source)["tours"]
-    return value
+class pdfReport:
+    """
+    Creates a PDF report
+    """
+    def __init__(self, filename):
+        self.filename = filename
 
-def send_email(message):
-    host = "smtp.gmail.com"
-    port = 465
+    def generate(self, roommate1, roommate2, bill):
+        pass
 
-    username = "weslhdavmsu@gmail.com"
-    password = "ylavwroupvtcuomq"
-
-    receiver = "welshdavmsu@gmail.com"
-    context = ssl.create_default_context()
-
-    with smtplib.SMTP_SSL(host, port, context=context) as server:
-        server.login(username, password)
-        server.sendmail(username, receiver, message)
-    print("Email was sent")
-
-def store(extracted):
-    row = extracted.split(",")
-    row = [item.strip() for item in row]
-    cursor = connection.cursor()
-    cursor.execute("INSERT INTO events VALUES(?, ?, ?)", row)
-    connection.commit()
-
-def read(extracted):
-    row = extracted.split(",")
-    row = [item.strip() for item in row]
-    band, city, date = row
-    cursor = connection.cursor()
-    cursor.execute("SELECT * FROM events WHERE band=? AND city=? AND date=?", (band, city, date))
-    rows = cursor.fetchall()
-    print(rows)
-
-if __name__ == "__main__":
-    scraped = scrape(URL)
-    extracted = extract(scraped)
-    print(extracted)
-    content = read(extracted)
-    if extracted != "No Upcoming Tours":
-        row = read(extracted)
-        if not row:
-            store(extracted)
-    time.sleep(2)
+the_bill = Bill(amount=120, period= "May 2022")
+max = Roommate(name="Max", time=28)
+jen = Roommate(name="Jen", time=21)
